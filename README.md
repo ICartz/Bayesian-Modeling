@@ -11,13 +11,6 @@ This repository contains my academic and self-learning projects related to Bayes
 - Posterior analysis
 - Count data models
 
-## Software Used
-
-- R
-- JAGS
-- coda
-- ggplot2
-
 ## Current Projects
 
 ### Beer Price–Quality Bayesian Modeling
