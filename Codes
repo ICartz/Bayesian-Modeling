@@ -84,10 +84,9 @@ jags_data <- list(
   nprice = nrows,
   price = price_index
 )
+
 params = c("alpha", "beta", "yrep")
 
-
-set.seed(8)
 model = jags.model(
   textConnection(jags_model),
   data = jags_data,
@@ -96,10 +95,7 @@ model = jags.model(
 )
 update(model, 1000)  
 
-mcmc_samples = coda.samples(model,
-                             variable.names = params,
-                             n.iter = 8000,
-                             thin = 4)
+mcmc_samples = coda.samples(model, variable.names = params, n.iter = 8000, thin = 4)
 
 print(gelman.diag(mcmc_samples, multivariate=FALSE))
 summary_stats = summary(mcmc_samples)
@@ -157,17 +153,14 @@ get_expected_scores = function(draw_row) {
   expected = pmat %*% scores
   as.numeric(expected)
 }
-
 expectations = t(apply(draws_list, 1, get_expected_scores)) # draws x prices
 prob_3_gt_1 = mean(expectations[,3] > expectations[,1])
 prob_2_gt_1 = mean(expectations[,2] > expectations[,1])
 prob_3_gt_2 = mean(expectations[,3] > expectations[,2])
+print(prob_2_gt_1)
+print(prob_3_gt_1)
+print(prob_3_gt_2)
 
-# Visual: posterior expected scores summary
-expect_df = data.frame(draw=1:n_draws,
-                        Price1 = expectations[,1],
-                        Price2 = expectations[,2],
-                        Price3 = expectations[,3])
 # basic summaries
 print(tibble(
   Price = c('1','2','3'),
@@ -177,7 +170,6 @@ print(tibble(
 ))
 
 
-  
 data_table = data_table %>%
 mutate(
   Price = factor(Price, levels=c(1,2,3), labels=c("Low","Medium","High")),
@@ -188,14 +180,11 @@ mutate(
 ggplot(data_table, aes(x = Quality, y = Price, fill = Count)) +
   geom_tile(color = "white") +
   scale_fill_viridis_c() +
-  labs(
-    title = "Quality Ratings by Price (Heatmap)",
-    x = "Quality Rating",
-    y = "Price Label",
-    fill = "Count"
+  labs( title = "Quality Ratings by Price (Heatmap)", 
+        x = "Quality Rating",
+        y = "Price Label", fill = "Count"
   ) +
   theme_minimal(base_size = 14)
-
 
 
 post = as.matrix(mcmc_samples)
@@ -205,8 +194,7 @@ beta3 = post[, "beta[3]"]
 
 df = tibble(
   value = c(beta2, beta3),
-  parameter = rep(c("beta2 (Medium vs Low)", "beta3 (High vs Low)"),
-                  each = nrow(post))
+  parameter = rep(c("beta2 (Medium vs Low)", "beta3 (High vs Low)"), each = nrow(post))
 )
 
 # Density plot
